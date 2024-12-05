@@ -2,28 +2,34 @@ import os
 import time 
 
 def create_or_update_md_files(PDFdirectory, MDdirectory):
-    for subdir, _, files in os.walk(PDFdirectory):
-        # Determine the relative path of the current subdirectory within PDFdirectory
-        relative_path = os.path.relpath(subdir, PDFdirectory)
-        print(relative_path)
-        # Corresponding directory in MDdirectory
-        md_subdir = os.path.join(MDdirectory, relative_path)
-        os.makedirs(md_subdir, exist_ok=True)  # Ensure the subdirectory exists
-        print(f"Going through subdirectory {subdir}")
-        # Process each PDF file in the current subdirectory
-        for file in files:
-            if file.endswith(".pdf"):
-                # print(f"Creating/Updating md file {file}")
-                pdf_name = file[:-4]  # Remove .pdf extension
-                pdf_path = os.path.join(subdir, file)
-                
-                # Path to corresponding .md file
-                md_file_path = os.path.join(md_subdir, f"{pdf_name}.md")
-                
-                # Create or update the .md file
-                create_or_update_md_file(pdf_path, md_file_path)
-        print("-----------------FINISHED WITH THIS SUBDIRECTORY-----------------")
-        time.sleep(10)
+    # for subdir, _, files in os.walk(PDFdirectory):
+    for entry in os.listdir(PDFdirectory):
+        subdir = os.path.join(PDFdirectory, entry)
+        # print(entry)
+        # time.sleep(50)
+        if os.path.isdir(subdir):
+            # Determine the relative path of the current subdirectory within PDFdirectory
+            # subdir = os.path.join(PDFdirectory, entry)
+            print(subdir)
+            # Corresponding directory in MDdirectory
+            md_subdir = os.path.join(MDdirectory, entry)
+            os.makedirs(md_subdir, exist_ok=True)  # Ensure the subdirectory exists
+            print(f"Going through subdirectory {subdir}")
+            # Process each PDF file in the current subdirectory
+            for file in sorted(os.listdir(subdir)):
+                if file.endswith(".pdf"):
+                    # print(f"Creating/Updating md file {file}")
+                    pdf_name = file[:-4]  # Remove .pdf extension
+                    pdf_path = os.path.join(subdir, file)
+                    
+                    # Path to corresponding .md file
+                    md_file_path = os.path.join(md_subdir, f"{pdf_name}.md")
+                    
+                    # Create or update the .md file
+                    create_or_update_md_file(pdf_path, md_file_path)
+            print(f"Finished with subdirectory {subdir}")
+            print("-----------------FINISHED WITH THIS SUBDIRECTORY-----------------")
+            time.sleep(10)
 
 def read_tags_from_file(tags_file, pdf_name):
     if not os.path.exists(tags_file):
